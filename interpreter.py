@@ -8,13 +8,14 @@ class Interpreter:
     if tree == None:
       tree = self.tree
 
-    if not isinstance(tree, list):
-      return tree
-    if not isinstance(tree, list) and tree[0].type == "METH":
+    if tree[0].type == "METH":
       if len(tree) == 1 :
         return self.processMethod()
       else :
         return self.var_data.get_value(tree[1])
+
+    if not isinstance(tree, list):
+      return tree
 
     if isinstance(tree, list) and len(tree)==2 :
       exp = tree[1]

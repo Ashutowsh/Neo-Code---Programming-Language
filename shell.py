@@ -4,7 +4,7 @@ from interpreter import Interpreter
 from info import Info
 info = Info()
 while True :
-  inpText = input("Enter text : ")
+  inpText = input("Base Script : ")
   lexer = Lexer(inpText)
   arr = lexer.tokenization()
   # print(arr)
