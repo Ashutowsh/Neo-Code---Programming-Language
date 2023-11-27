@@ -1,4 +1,4 @@
-from tokens import Integer, Float
+from tokens import Integer, Float, Reserved, Method
 class Interpreter:
   def __init__(self, tree, var_data):
     self.tree = tree
@@ -8,7 +8,8 @@ class Interpreter:
     if tree == None:
       tree = self.tree
 
-    if tree[0].type == "METH":
+    # if not isinstance(tree[0], list) and tree[0].type == "METH"
+    if isinstance(tree[0], Method):
       if len(tree) == 1 :
         return self.processMethod()
       else :
@@ -16,6 +17,28 @@ class Interpreter:
 
     if not isinstance(tree, list):
       return tree
+    
+    if isinstance(tree, list):
+       if isinstance(tree[0], Reserved):
+          if tree[0].value == "if":
+            for idx, condition in enumerate(tree[1][0]):
+              evaluation = self.interpret(condition)
+              if evaluation.value == 1:
+                return self.interpret(tree[1][1][idx])
+                    
+            if len(tree[1]) == 3:
+              return self.interpret(tree[1][2])
+              
+            else:
+              return
+            
+          elif tree[0].value == "repeat":
+            condition = self.interpret(tree[1][0])
+                    
+            while condition.value == 1:
+              print(self.interpret(tree[1][1]))
+              condition = self.interpret(tree[1][0]) 
+            return
 
     if isinstance(tree, list) and len(tree)==2 :
       exp = tree[1]
@@ -27,6 +50,7 @@ class Interpreter:
     left_node = tree[0]
     if isinstance(left_node, list):
       left_node = self.interpret(left_node)
+      
     right_node = tree[2]
     if isinstance(right_node, list):
       right_node = self.interpret(right_node)
@@ -91,8 +115,9 @@ class Interpreter:
     operand = getattr(self, f"read_{operand_type}")(operand.value)
 
     if operator.value == "+":
-      return +operand
+      output = +operand
     elif operator.value == "-":
-      return -operand
+      output = -operand
     elif operator.value=="not":
-      return 1 if not operand else 0
+      output  = 1 if not operand else 0
+    return Integer(output) if (operand_type=="INT") else Float(output)

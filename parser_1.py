@@ -11,7 +11,11 @@ class Parser:
       return self.assignVariable()
     elif self.token.type=="METH" :
       return self.handleMethod()
-
+    elif self.token.value == "if":
+      return [self.token, self.ifStatements()]
+    elif self.token.value == "repeat":
+      return [self.token, self.whileStatements()]
+    
   def factor(self):
     if self.token.type == "INT" or self.token.type == "FLT":
       return self.token
@@ -95,3 +99,50 @@ class Parser:
     self.index+=1
     if self.index<len(self.token_arr):
       self.token = self.token_arr[self.index]
+  
+  def handleIf(self):
+    self.move()
+    condition = self.booleanExpression()
+
+    if self.token.value == "perform":
+      self.move()
+      action = self.parse()
+      return condition, action
+    
+    elif self.tokens[self.idx-1].value == "perform":
+      action = self.parse()
+      return condition, action
+  
+  def whileStatements(self):
+      self.move()
+      condition = self.booleanExpression()
+        
+      if self.token.value == "perform":
+        self.move()
+        action = self.parse()
+        return [condition, action]
+        
+      elif self.tokens[self.idx-1].value == "perform":
+        action = self.parse()
+        return [condition, action]
+
+  def ifStatements(self):
+    conditions = []
+    actions = []
+
+    arr = self.handleIf()
+
+    conditions.append(arr[0])
+    actions.append(arr[1])
+
+    while self.token.value=="orif":
+      arr = self.handleIf()
+      conditions.append(arr[0])
+      actions.append(arr[1])
+
+    if self.token.value == "otherwise":
+      self.move()
+      self.move()
+      other = self.parse()
+      return [conditions, actions, other]
+    return [conditions, actions]

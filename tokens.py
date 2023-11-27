@@ -36,6 +36,6 @@ class Boolean(Token):
 class Comparator(Token):
   def __init__(self, value):
     super().__init__("COMPARATOR", value)
-# class Reserved(Token):
-#   def __init__(self, value):
-#     super().__init__("RESERVED", value)
+class Reserved(Token):
+  def __init__(self, value):
+    super().__init__("RESERVED", value)
